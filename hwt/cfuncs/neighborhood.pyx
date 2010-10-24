@@ -29,8 +29,8 @@ def circle(np.ndarray[DTYPE3_t, ndim=2] data,
     cdef float rng, distsq, dist
     cdef Py_ssize_t i, j, ii, jj
 
-    cdef np.ndarray[DTYPE3_t, ndim=2] hitmiss = np.zeros([ulength, vlength], dtype=DTYPE)
-    cdef np.ndarray[DTYPE3_t, ndim=2] tmphit = np.zeros([ulength, vlength], dtype=DTYPE)
+    cdef np.ndarray[DTYPE3_t, ndim=2] hitmiss = np.zeros([ulength, vlength], dtype=DTYPE3)
+    cdef np.ndarray[DTYPE3_t, ndim=2] tmphit = np.zeros([ulength, vlength], dtype=DTYPE3)
     
     rng = roi/dx
     ng = int(rng)
