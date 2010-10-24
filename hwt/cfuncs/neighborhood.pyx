@@ -10,8 +10,8 @@ ctypedef np.float32_t DTYPE_t
 DTYPE2 = np.int
 ctypedef np.int_t DTYPE2_t
 
-DTYPE = np.float64
-ctypedef np.float64_t DTYPE_t
+DTYPE3 = np.float64
+ctypedef np.float64_t DTYPE3_t
 
 
 
@@ -73,7 +73,6 @@ def findExceed(np.ndarray[DTYPE_t, ndim=2] var,
                 var[i,j] = 1
                 
     return(var)
-
 
 
 @cython.boundscheck(False)
