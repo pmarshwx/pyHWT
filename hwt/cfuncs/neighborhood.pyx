@@ -4,15 +4,20 @@ cimport numpy as np
 cimport cython
 
 
+DTYPE = np.float32
+ctypedef np.float32_t DTYPE_t
+
+DTYPE2 = np.int
+ctypedef np.int_t DTYPE2_t
+
 DTYPE = np.float64
 ctypedef np.float64_t DTYPE_t
 
 
 
-
 @cython.boundscheck(False)
 @cython.cdivision(True)
-def circle(np.ndarray[DTYPE_t, ndim=2] data, 
+def circle(np.ndarray[DTYPE3_t, ndim=2] data, 
            float thresh, 
            float roi, 
            float dx):
@@ -24,8 +29,8 @@ def circle(np.ndarray[DTYPE_t, ndim=2] data,
     cdef float rng, distsq, dist
     cdef Py_ssize_t i, j, ii, jj
 
-    cdef np.ndarray[DTYPE_t, ndim=2] hitmiss = np.zeros([ulength, vlength], dtype=DTYPE)
-    cdef np.ndarray[DTYPE_t, ndim=2] tmphit = np.zeros([ulength, vlength], dtype=DTYPE)
+    cdef np.ndarray[DTYPE3_t, ndim=2] hitmiss = np.zeros([ulength, vlength], dtype=DTYPE)
+    cdef np.ndarray[DTYPE3_t, ndim=2] tmphit = np.zeros([ulength, vlength], dtype=DTYPE)
     
     rng = roi/dx
     ng = int(rng)
@@ -50,3 +55,42 @@ def circle(np.ndarray[DTYPE_t, ndim=2] data,
     return tmphit
     
    
+@cython.boundscheck(False)
+def findExceed(np.ndarray[DTYPE_t, ndim=2] var,
+               np.ndarray[DTYPE2_t, ndim=2] mask,
+               float thresh,
+               int missing = 9999):
+
+    cdef unsigned int ii = var.shape[0]
+    cdef unsigned int jj = var.shape[1]
+    cdef Py_ssize_t i, j
+    
+    for i in range(ii):
+        for j in range(jj):
+            if mask[i,j] == 0 or mask[i,j] == missing or var[i,j] == missing or var[i,j] < thresh:
+                var[i,j] = 0
+            else:
+                var[i,j] = 1
+                
+    return(var)
+
+
+
+@cython.boundscheck(False)
+def findMaxGrid(np.ndarray[DTYPE_t, ndim=2] max,
+                np.ndarray[DTYPE_t, ndim=2] var,
+                np.ndarray[DTYPE2_t, ndim=2] mask,
+                int missing = 9999):
+
+    cdef unsigned int ii = var.shape[0]
+    cdef unsigned int jj = var.shape[1]
+    cdef Py_ssize_t i, j
+    
+    for i in range(ii):
+        for j in range(jj):
+            if mask[i,j] == 0 or mask[i,j] == missing or var[i,j] == missing or var[i,j] < max[i,j]:
+                var[i,j] = 0
+            else:
+                max[i,j] = var[i,j]
+                
+    return(max)
