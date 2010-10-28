@@ -4,20 +4,20 @@ cimport numpy as np
 cimport cython
 
 
-DTYPE = np.float32
-ctypedef np.float32_t DTYPE_t
+DTYPE = np.float64
+ctypedef np.float64_t DTYPE_t
 
 DTYPE2 = np.int
 ctypedef np.int_t DTYPE2_t
 
-DTYPE3 = np.float64
-ctypedef np.float64_t DTYPE3_t
+DTYPE32 = np.float32
+ctypedef np.float32_t DTYPE32_t
 
 
 
 @cython.boundscheck(False)
 @cython.cdivision(True)
-def circle(np.ndarray[DTYPE3_t, ndim=2] data, 
+def circle(np.ndarray[DTYPE_t, ndim=2] data, 
            float thresh, 
            float roi, 
            float dx):
@@ -29,8 +29,8 @@ def circle(np.ndarray[DTYPE3_t, ndim=2] data,
     cdef float rng, distsq, dist
     cdef Py_ssize_t i, j, ii, jj
 
-    cdef np.ndarray[DTYPE3_t, ndim=2] hitmiss = np.zeros([ulength, vlength], dtype=DTYPE3)
-    cdef np.ndarray[DTYPE3_t, ndim=2] tmphit = np.zeros([ulength, vlength], dtype=DTYPE3)
+    cdef np.ndarray[DTYPE_t, ndim=2] hitmiss = np.zeros([ulength, vlength], dtype=DTYPE)
+    cdef np.ndarray[DTYPE_t, ndim=2] tmphit = np.zeros([ulength, vlength], dtype=DTYPE)
     
     rng = roi/dx
     ng = int(rng)
@@ -65,14 +65,16 @@ def findExceed(np.ndarray[DTYPE_t, ndim=2] var,
     cdef unsigned int jj = var.shape[1]
     cdef Py_ssize_t i, j
     
+    cdef np.ndarray[DTYPE_t, ndim=2] newvar = np.zeros([ii, jj], dtype=DTYPE)
+
     for i in range(ii):
         for j in range(jj):
             if mask[i,j] == 0 or mask[i,j] == missing or var[i,j] == missing or var[i,j] < thresh:
-                var[i,j] = 0
+                newvar[i,j] = 0
             else:
-                var[i,j] = 1
+                newvar[i,j] = 1
                 
-    return(var)
+    return(newvar)
 
 
 @cython.boundscheck(False)

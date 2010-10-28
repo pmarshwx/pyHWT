@@ -52,6 +52,7 @@ def gaussian(np.ndarray[DTYPE_t, ndim=2] data,
                 
     for i in range(0,ulength):
         for j in range(0,vlength):
+            #print i, j
             if data[i,j] > 0:
                 amp = data[i,j] / (2*PI*sigmasq)
                 jw=j-ng
