@@ -18,7 +18,7 @@ def get_git_revision():
                       _repository_path], stdout=PIPE)
         text = proc.stdout.readline()
         text = text.replace('"', '').split()
-        rev = '.dev.' + text[0] + '.' + text[1]
+        rev = '.dev.' + text[0] + ' (' + text[1] + ')'
     except OSError:
         # GIT not installed, don't worry about finding the revision hash
         pass
