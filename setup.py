@@ -18,9 +18,9 @@ packages = ['hwt', 'hwt.plot', 'hwt.cfuncs']
 setup_path = os.path.split(os.path.abspath(__file__))[0]
 sys.path.append(os.path.join(setup_path, dirname))
 import version
+version.write_git_version()
 ver = version.get_version()
 sys.path.pop()
-
 
 # Scan directory for extension files, converting
 # them to extension names in dotted notation
