@@ -38,7 +38,7 @@ def get_git_hash():
 def get_git_revision():
     hash = get_git_hash()
     if hash :
-        rev = hash[:7]
+        rev = '.dev' + hash[:7]
         try:
             cmd = ['git', 'show', '%s' % (hash), '--date=short',
                    '--format="(%ad)"']
@@ -48,6 +48,7 @@ def get_git_revision():
             pass
     else:
         rev = None
+
     return rev
 
 def write_git_version():
@@ -57,7 +58,7 @@ def write_git_version():
         if os.path.isfile(_git_file_path):
             return
         else:
-            rev = "Unknown"
+            rev = ".dev"
     gitfile = open(_git_file_path, 'w')
     gitfile.write('rev = "%s"\n' % rev)
     gitfile.close()
@@ -71,9 +72,11 @@ def get_version():
     version = __version__
     if not release:
         try:
+            import me
             import __git_version__
             version += __git_version__.rev
         except ImportError:
             version += get_git_revision()
-            pass
+
+
     return version
