@@ -38,7 +38,7 @@ def get_git_hash():
 def get_git_revision():
     hash = get_git_hash()
     if hash :
-        rev = '.dev' + hash[:7]
+        rev = '.dev.' + hash[:7]
         try:
             cmd = ['git', 'show', '%s' % (hash), '--date=short',
                    '--format="(%ad)"']
