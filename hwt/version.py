@@ -47,18 +47,16 @@ def get_git_revision():
         except:
             pass
     else:
-        rev = None
+        rev = ".dev.Unknown"
 
     return rev
 
 def write_git_version():
     'Write the GIT revision to a file.'
     rev = get_git_revision()
-    if not rev:
+    if rev == ".dev.Unknown":
         if os.path.isfile(_git_file_path):
             return
-        else:
-            rev = ".dev"
     gitfile = open(_git_file_path, 'w')
     gitfile.write('rev = "%s"\n' % rev)
     gitfile.close()
@@ -72,11 +70,9 @@ def get_version():
     version = __version__
     if not release:
         try:
-            import me
             import __git_version__
             version += __git_version__.rev
         except ImportError:
             version += get_git_revision()
-
-
+    
     return version
