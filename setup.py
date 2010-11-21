@@ -1,6 +1,8 @@
 from __future__ import print_function, division
+import distutils.sysconfig
 from distutils.core import setup
 from distutils.extension import Extension
+from distutils.command.install_data import install_data
 import numpy as np
 import os, sys
 
@@ -11,16 +13,6 @@ except:
     print("You don't seem to have Cython installed. Please get a ")
     print("copy from www.cython.org and install it")
     sys.exit(1)
-
-
-dirname = 'hwt'
-packages = ['hwt', 'hwt.plot', 'hwt.cfuncs']
-setup_path = os.path.split(os.path.abspath(__file__))[0]
-sys.path.append(os.path.join(setup_path, dirname))
-import version
-version.write_git_version()
-ver = version.get_version()
-sys.path.pop()
 
 # Scan directory for extension files, converting
 # them to extension names in dotted notation
@@ -57,29 +49,44 @@ def makeExtension(extName):
         )
 
 
-# get the list of extensions
+# Setup Variables
+dirname = 'hwt'
+packages = ['hwt', 'hwt.plot', 'hwt.cfuncs']
+setup_path = os.path.split(os.path.abspath(__file__))[0]
+sys.path.append(os.path.join(setup_path, dirname))
+module_path = distutils.sysconfig.get_python_lib()
+include_files = ['LICENSE', 'README']
+data_files = [(os.path.join(module_path, dirname), include_files)]
+
+import version
+version.write_git_version()
+ver = version.get_version()
+sys.path.pop()
+
+# Get the list of extensions
 extNames = scandir(dirname)
 
-# and build up the set of Extension objects
+# Build the set of Extension objects
 extensions = [makeExtension(name) for name in extNames]
 
-setup(name = 'HWT',
-      version = ver,
-      description       = 'Python Module for HWT Post Processing',
-      author            = 'Patrick Marsh',
-      author_email      = 'patrick.marsh@noaa.gov',
-      url               = '',
-      download_url      = '',
-      packages          = packages,
-      scripts           = [],
-      cmdclass          = {'build_ext': build_ext},
-      ext_modules       = extensions
-      )
+setup(
+    name                    = 'HWT',
+    version                 = ver,
+    description             = 'Python Module for HWT Post Processing',
+    author                  = 'Patrick Marsh',
+    author_email            = 'patrick.marsh@noaa.gov',
+    url                     = '',
+    download_url            = '',
+    packages                = packages,
+    data_files              = data_files,
+    scripts                 = [],
+    cmdclass                = {'build_ext': build_ext},
+    ext_modules             = extensions,   )
 
 cleanup(dirname, '.c')
 cleanup(dirname, '.html')
 cleanup(dirname, '.pyc')
 cleanup(dirname, '.pyd')
-if sys.argv[1] not in ['build']:
+if sys.argv[1] in ['install']:
     import shutil
     shutil.rmtree('build')
