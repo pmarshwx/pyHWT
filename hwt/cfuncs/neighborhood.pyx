@@ -35,16 +35,16 @@ def circle(np.ndarray[DTYPE_t, ndim=2] data,
     rng = roi/dx
     ng = int(rng)
     
-    for j in range(vlength):
-        for i in range(ulength):
+    for i in range(ulength):
+        for j in range(vlength):
             jw = j-ng
             je = j+ng + 1
             isouth = i-ng
             inorth = i+ng + 1
             if data[i,j] >= thresh:
                 tmphit[i,j] = 1
-                for jj in range(jw, je):
-                    for ii in range(isouth, inorth):
+                for ii in range(isouth, inorth):
+                    for jj in range(jw, je):
                         distsq = float(j-jj)**2 + float(i-ii)**2
                         dist = distsq**0.5
                         if dist <= rng:
