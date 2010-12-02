@@ -16,11 +16,12 @@ ctypedef np.float32_t DTYPE32_t
 
 
 @cython.boundscheck(False)
-def ptype(np.ndarray[DTYPE32_t, ndim=2] cloud,
-          np.ndarray[DTYPE32_t, ndim=2] rain,
-          np.ndarray[DTYPE32_t, ndim=2] snow,
-          np.ndarray[DTYPE32_t, ndim=2] cldice,
-          np.ndarray[DTYPE32_t, ndim=2] graupel):
+def ptype(np.ndarray[DTYPE2_t, ndim=2] cloud,
+          np.ndarray[DTYPE2_t, ndim=2] rain,
+          np.ndarray[DTYPE2_t, ndim=2] snow,
+          np.ndarray[DTYPE2_t, ndim=2] cldice,
+          np.ndarray[DTYPE2_t, ndim=2] graupel,
+          np.ndarray[DTYPE2_t, ndim=2] t2m):
 
     cdef unsigned int ii = cloud.shape[0]
     cdef unsigned int jj = cloud.shape[1]
@@ -33,8 +34,11 @@ def ptype(np.ndarray[DTYPE32_t, ndim=2] cloud,
             # Is rain the largest
             if (rain[i,j] > cloud[i,j] and rain[i,j] > snow[i,j] and 
                 rain[i,j] > cldice[i,j] and rain[i,j] > graupel[i,j]):
-                    ptype[i,j] = 1
-            
+                    if t2m[i,j] > 273.15:
+                        ptype[i,j] = 1
+                    # Check for Freezing Rain
+                    else:
+                        ptype[i,j] = 5
             # Is snow the largest
             elif (snow[i,j] > cloud[i,j] and snow[i,j] > rain[i,j] and 
                   snow[i,j] > cldice[i,j] and cloud[i,j] > graupel[i,j]):
@@ -48,21 +52,32 @@ def ptype(np.ndarray[DTYPE32_t, ndim=2] cloud,
             # Is cloud the largest
             elif (cloud[i,j] > rain[i,j] and cloud[i,j] > snow[i,j] and 
                   cloud[i,j] > cldice[i,j] and cloud[i,j] > graupel[i,j]):
-                    ptype[i,j] = 5
+                  if t2m[i,j] > 273.15:
+                      ptype[i,j] = 6
+                  # Check for Freezing Fog
+                  else:
+                      ptype[i,j] = 7
 
             # Is cldice the largest
             elif (cldice[i,j] > cloud[i,j] and cldice[i,j] > rain[i,j] and 
                   cldice[i,j] > snow[i,j] and cldice[i,j] > graupel[i,j]):
-                    ptype[i,j] = 6
+                    ptype[i,j] = 8
                     
             # Is any of the rain, snow, grapuel equal
             elif (rain[i,j] == snow[i,j] or rain[i,j] == graupel[i,j] or 
                   snow[i,j] == graupel[i,j]):
-                    ptype[i,j] = 4
+                    if (rain[i,j] == 0 and snow[i,j] == 0 and 
+                        graupel[i,j] == 0):
+                            ptype[i,j] = 0
+                    else:
+                            ptype[i,j] = 4
                     
             # Is cloud equal to cldice
             elif (cloud[i,j] == cldice[i,j]):
-                    ptype[i,j] = 7
+                    if (cloud[i,j] == 0 and cldice[i,j] == 0):
+                        ptype[i,j] = 0
+                    else:
+                        ptype[i,j] = 8
             
             # If nothing matches, set to 0
             else:
