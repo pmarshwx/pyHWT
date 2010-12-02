@@ -53,6 +53,7 @@ def regional_threshold(np.ndarray[DTYPE32_t, ndim=2] qpf,
     cdef unsigned int ulength = qpf.shape[0]
     cdef unsigned int vlength = qpf.shape[1]
     cdef unsigned int ng, valid, ind
+    cdef int missing = -9999
     cdef int jw, je, isouth, inorth
     cdef float rng, distsq, dist
     cdef Py_ssize_t i, j, ii, jj
@@ -74,8 +75,35 @@ def regional_threshold(np.ndarray[DTYPE32_t, ndim=2] qpf,
             qpftmppts = []
             qpetmppts = []
             if mask[i,j] == 0 or mask[i,j] == 9999 or qpf[i,j] == 9999 or qpe[i,j] == 9999:
-                qpfthreshes[i,j] = 9999
-                qpethreshes[i,j] = 9999
+                if i+skip < ulength:
+                    if j+skip < vlength:
+                        #for ii from i <= ii < i+skip:
+                        #    for jj from j <= jj < j+skip:
+                        #        qpfthreshes[ii,jj] = missing
+                        #        qpethreshes[ii,jj] = missing
+                        qpfthreshes[i:i+skip,j:j+skip] = missing
+                        qpethreshes[i:i+skip,j:j+skip] = missing
+                    else:
+                        #for ii from i <= ii < i+skip:
+                        #    for jj from j <= jj < vlength:
+                        #        qpfthreshes[ii,jj] = missing
+                        #        qpethreshes[ii,jj] = missing
+                        qpfthreshes[i:i+skip,j:] = missing
+                        qpethreshes[i:i+skip,j:] = missing
+                elif j+skip < vlength:
+                    #for ii from i <= ii < ulength:
+                    #    for jj from j <= jj < j+skip:
+                    #        qpfthreshes[ii,jj] = missing
+                    #        qpethreshes[ii,jj] = missing
+                    qpfthreshes[i:,j:j+skip] = missing
+                    qpethreshes[i:,j:j+skip] = missing
+                else:
+                    #for ii from i <= ii < ulength:
+                    #    for jj from j <= jj < vlength:
+                    #        qpfthreshes[ii,jj] = missing
+                    #        qpethreshes[ii,jj] = missing
+                    qpfthreshes[i:,j:] = missing
+                    qpethreshes[i:,j:] = missing
                 continue
             jw = j-ng
             je = j+ng + 1
@@ -101,10 +129,44 @@ def regional_threshold(np.ndarray[DTYPE32_t, ndim=2] qpf,
             qpftmp = np.sort(qpftmp)
             qpetmp = np.array(qpetmppts)
             qpetmp = np.sort(qpetmp)
-            qpfthreshes[i,j] = qpftmp[ind]
-            qpethreshes[i,j] = qpetmp[ind]
-            validpts[i,j] = valid
-                            
+            if i+skip < ulength:
+                if j+skip < vlength:
+                    #for ii from i <= ii < i+skip:
+                    #    for jj from j <= jj < j+skip:
+                    #        qpfthreshes[ii,jj] = qpftmp[ind]
+                    #        qpethreshes[ii,jj] = qpetmp[ind]
+                    #        validpts[ii,jj] = valid
+                    qpfthreshes[i:i+skip,j:j+skip] = qpftmp[ind]
+                    qpethreshes[i:i+skip,j:j+skip] = qpetmp[ind]
+                    validpts[i:i+skip,j:j+skip] = valid
+                else:
+                    #for ii from i <= ii < i+skip:
+                    #    for jj from j <= jj < vlength:
+                    #        qpfthreshes[ii,jj] = qpftmp[ind]
+                    #        qpethreshes[ii,jj] = qpetmp[ind]
+                    #        validpts[ii,jj] = valid
+                    qpfthreshes[i:i+skip,j:] = qpftmp[ind]
+                    qpethreshes[i:i+skip,j:] = qpetmp[ind]
+                    validpts[i:i+skip,j:] = valid
+            elif j+skip < vlength:
+                #for ii from i <= ii < ulength:
+                #    for jj from j <= jj < j+skip:
+                #        qpfthreshes[ii,jj] = qpftmp[ind]
+                #        qpethreshes[ii,jj] = qpetmp[ind]
+                #        validpts[ii,jj] = valid
+                qpfthreshes[i:,j:j+skip] = qpftmp[ind]
+                qpethreshes[i:,j:j+skip] = qpetmp[ind]
+                validpts[i:,j:j+skip] = valid
+            else:
+                #for ii from i <= ii < ulength:
+                #    for jj from j <= jj < vlength:
+                #        qpfthreshes[ii,jj] = qpftmp[ind]
+                #        qpethreshes[ii,jj] = qpetmp[ind]
+                #        validpts[ii,jj] = valid
+                qpfthreshes[i:,j:] = qpftmp[ind]
+                qpethreshes[i:,j:] = qpetmp[ind]
+                validpts[i:,j:] = valid
+                                
                         
     return (qpfthreshes, qpethreshes, validpts)
 
