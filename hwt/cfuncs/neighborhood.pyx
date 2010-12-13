@@ -64,7 +64,7 @@ def findExceed(np.ndarray[DTYPE_t, ndim=2] var,
     cdef unsigned int ii = var.shape[0]
     cdef unsigned int jj = var.shape[1]
     cdef Py_ssize_t i, j
-    
+
     cdef np.ndarray[DTYPE_t, ndim=2] newvar = np.zeros([ii, jj], dtype=DTYPE)
 
     for i in range(ii):
@@ -73,7 +73,30 @@ def findExceed(np.ndarray[DTYPE_t, ndim=2] var,
                 newvar[i,j] = 0
             else:
                 newvar[i,j] = 1
-                
+
+    return(newvar)
+
+
+@cython.boundscheck(False)
+def findRegionalExceed(np.ndarray[DTYPE_t, ndim=2] var,
+                       np.ndarray[DTYPE_t, ndim=2] thresh,
+                       np.ndarray[DTYPE2_t, ndim=2] mask,
+                       int missing = -9999):
+
+    cdef unsigned int ii = var.shape[0]
+    cdef unsigned int jj = var.shape[1]
+    cdef Py_ssize_t i, j
+
+    cdef np.ndarray[DTYPE_t, ndim=2] newvar = np.zeros([ii, jj], dtype=DTYPE)
+
+    for i in range(ii):
+        for j in range(jj):
+            if (mask[i,j] == 0 or mask[i,j] == missing or 
+                var[i,j] == missing or var[i,j] < thresh[i,j]):
+                    newvar[i,j] = 0
+            else:
+                    newvar[i,j] = 1
+
     return(newvar)
 
 
