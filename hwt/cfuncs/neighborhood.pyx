@@ -81,6 +81,7 @@ def findExceed(np.ndarray[DTYPE_t, ndim=2] var,
 def findRegionalExceed(np.ndarray[DTYPE_t, ndim=2] var,
                        np.ndarray[DTYPE_t, ndim=2] thresh,
                        np.ndarray[DTYPE2_t, ndim=2] mask,
+                       float minthresh = 25.4,
                        int missing = -9999):
 
     cdef unsigned int ii = var.shape[0]
@@ -95,7 +96,10 @@ def findRegionalExceed(np.ndarray[DTYPE_t, ndim=2] var,
                 var[i,j] == missing or var[i,j] < thresh[i,j]):
                     newvar[i,j] = 0
             else:
-                    newvar[i,j] = 1
+                    if var[i,j] >= minthresh:
+                        newvar[i,j] = 1
+                    else:
+                        newvar[i,j] = 0
 
     return(newvar)
 
