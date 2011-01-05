@@ -82,7 +82,7 @@ def findRegionalExceed(np.ndarray[DTYPE_t, ndim=2] var,
                        np.ndarray[DTYPE_t, ndim=2] thresh,
                        np.ndarray[DTYPE2_t, ndim=2] mask,
                        float minthresh = 25.4,
-                       int missing = -9999):
+                       int missing = 9999):
 
     cdef unsigned int ii = var.shape[0]
     cdef unsigned int jj = var.shape[1]
