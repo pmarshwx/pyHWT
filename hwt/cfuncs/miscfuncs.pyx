@@ -41,7 +41,7 @@ def ptype(np.ndarray[DTYPE2_t, ndim=2] rain,
                         ptype[i,j] = 5
             # Is snow the largest
             elif (snow[i,j] > cloud[i,j] and snow[i,j] > rain[i,j] and 
-                  snow[i,j] > ice[i,j] and cloud[i,j] > graupel[i,j]):
+                  snow[i,j] > ice[i,j] and snow[i,j] > graupel[i,j]):
                     ptype[i,j] = 2
             
             # Is graupel the largest
