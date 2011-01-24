@@ -26,8 +26,17 @@ def reliability(np.ndarray[DTYPE2_t, ndim=2] fcst,
     cdef unsigned int jj = fcst.shape[1]
     cdef Py_ssize_t i, j
     
-    cdef np.ndarray[DTYPE4_t, ndim=1] fhist = np.zeros(asize+1, dtype=DTYPE4)
-    cdef np.ndarray[DTYPE4_t, ndim=1] ohist = np.zeros(asize+1, dtype=DTYPE4)
+    # The reason we add +2 to asize is to account for the values at 0 and 
+    # 100. The user passes in negative numbers for those points exactly equal
+    # to 0. This becomes the first array element. The second array element are 
+    # all points that are between 0 and first value. Thus we must add an array 
+    # element to hold the points actually equal to 0.  Same is true for 100.  
+    # asize only accounts for points up to the value immediately preceding the
+    # last value so we must add another element to have a position for the last
+    # element. Thus, we have to add 2 additional elements to account for 
+    # everything
+    cdef np.ndarray[DTYPE4_t, ndim=1] fhist = np.zeros(asize+2, dtype=DTYPE4)
+    cdef np.ndarray[DTYPE4_t, ndim=1] ohist = np.zeros(asize+2, dtype=DTYPE4)
 
     cdef unsigned int iii, jjj
     
@@ -39,6 +48,10 @@ def reliability(np.ndarray[DTYPE2_t, ndim=2] fcst,
                 fhist[0] += 1
                 ohist[0] += obs[i,j]
             else:
+                # We must add 1 to the returned value because we added an 
+                # element to the beginning of the array for all points that
+                # were exactlyequal to 0. Elements at this point that are 
+                # equal to 0 are actually points between 0 and first value.
                 fhist[fcst[i,j]+1] += 1
                 ohist[fcst[i,j]+1] += obs[i,j]
             
