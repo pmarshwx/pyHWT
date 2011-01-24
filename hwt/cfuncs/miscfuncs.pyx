@@ -21,7 +21,8 @@ def ptype(np.ndarray[DTYPE2_t, ndim=2] rain,
           np.ndarray[DTYPE2_t, ndim=2] graupel,
           np.ndarray[DTYPE2_t, ndim=2] cloud,
           np.ndarray[DTYPE2_t, ndim=2] ice,
-          np.ndarray[DTYPE2_t, ndim=2] t2m):
+          np.ndarray[DTYPE2_t, ndim=2] t2m,
+          float minimum_threshold=0.000001):
 
     cdef unsigned int ii = cloud.shape[0]
     cdef unsigned int jj = cloud.shape[1]
@@ -61,7 +62,12 @@ def ptype(np.ndarray[DTYPE2_t, ndim=2] rain,
             # Is ice the largest
             elif (ice[i,j] > cloud[i,j] and ice[i,j] > rain[i,j] and 
                   ice[i,j] > snow[i,j] and ice[i,j] > graupel[i,j]):
-                    ptype[i,j] = 8
+                    # If ice is the largest, make sure it's greater than
+                    # minimum threshold
+                    if ice[i,j] > minimum_threshold:
+                        ptype[i,j] = 8
+                    else:
+                        continue
                     
             # Is any of the rain, snow, grapuel equal
             elif (rain[i,j] == snow[i,j] or rain[i,j] == graupel[i,j] or 
@@ -79,8 +85,8 @@ def ptype(np.ndarray[DTYPE2_t, ndim=2] rain,
                     else:
                         ptype[i,j] = 8
             
-            # If nothing matches, set to 0
+            # If nothing matches, skip
             else:
-                    ptype[i,j] = 0
+                    continue
     
     return ptype
