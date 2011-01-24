@@ -22,7 +22,7 @@ def ptype(np.ndarray[DTYPE2_t, ndim=2] rain,
           np.ndarray[DTYPE2_t, ndim=2] cloud,
           np.ndarray[DTYPE2_t, ndim=2] ice,
           np.ndarray[DTYPE2_t, ndim=2] t2m,
-          float minimum_threshold=0.000001):
+          float minimum_threshold=0.01):
 
     cdef unsigned int ii = cloud.shape[0]
     cdef unsigned int jj = cloud.shape[1]
