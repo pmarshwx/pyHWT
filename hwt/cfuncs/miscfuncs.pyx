@@ -83,7 +83,7 @@ def ptype(np.ndarray[DTYPE2_t, ndim=2] rain,
                     if (cloud[i,j] == 0 and ice[i,j] == 0):
                         ptype[i,j] = 0
                     else:
-                        ptype[i,j] = 8
+                        ptype[i,j] = 9
             
             # If nothing matches, skip
             else:
