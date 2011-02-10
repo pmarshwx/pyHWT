@@ -41,6 +41,34 @@ def precip(np.ndarray[DTYPE_t, ndim=2] var,
 
     
 @cython.boundscheck(False)
+def joint_precip(np.ndarray[DTYPE_t, ndim=2] var1,
+                 np.ndarray[DTYPE_t, ndim=2] var2,
+                 np.ndarray[DTYPE_t, ndim=2] mask,
+                 unsigned int asize):
+
+    cdef unsigned int ii = var1.shape[0]
+    cdef unsigned int jj = var1.shape[1]
+    cdef Py_ssize_t i, j
+
+    cdef np.ndarray[DTYPE2_t, ndim=1] hist1 = np.zeros(asize, dtype=DTYPE2)
+    cdef np.ndarray[DTYPE2_t, ndim=1] hist2 = np.zeros(asize, dtype=DTYPE2)
+
+    cdef unsigned int iii, jjj
+
+    for i in range(ii):
+        for j in range(jj):
+            if (mask[i,j] == 0 or mask[i,j] == 9999 or 
+                var1[i,j] == 9999 or var2[i,j]==9999):
+                continue
+            else:
+                hist1[var1[i,j]] += 1
+                hist2[var2[i,j]] += 1
+
+
+    return (hist1, hist2)
+
+
+@cython.boundscheck(False)
 @cython.cdivision(True)
 def regional_threshold(np.ndarray[DTYPE32_t, ndim=2] qpf, 
                        np.ndarray[DTYPE32_t, ndim=2] qpe,
