@@ -56,6 +56,50 @@ def circle(np.ndarray[DTYPE_t, ndim=2] data,
     
    
 @cython.boundscheck(False)
+@cython.cdivision(True)
+def error_composite(np.ndarray[DTYPE_t, ndim=2] fcst,
+                    np.ndarray[DTYPE_t, ndim=2] obs,
+                    float radius, 
+                    float dx):
+
+    cdef unsigned int ulength = fcst.shape[0]
+    cdef unsigned int vlength = fcst.shape[1]
+    cdef unsigned int ng, nx, ny, nw
+    cdef int jw, je, isouth, inorth, ngn
+    cdef float distsq, sqng
+    cdef Py_ssize_t i, j, ii, jj, nxx, nyy
+
+    ng = int(radius / dx)
+    sqng = float(ng * ng)
+    ngn = -1 * ng
+    nx = 2*ng+1
+    ny = 2*ng+1
+    nw=0
+
+    cdef np.ndarray[DTYPE_t, ndim=2] errors = np.zeros([nx, ny], dtype=DTYPE)
+
+    for i in range(0,ulength):
+        for j in range(0,vlength):
+            if fcst[i,j] > 0:
+                jw=j-ng
+                je=j+ng
+                isouth=i-ng
+                inorth=i+ng
+                for ii in range(-ng, ng+1):
+                    for jj in range(-ng, ng+1):
+                        iii = i + ii
+                        jjj = j + jj
+                        if jjj < 0 or jjj >= vlength or iii < 0 or iii >= ulength:
+                            continue
+                        elif obs[iii,jjj] > 0:
+                            errors[ii,jj] += 1
+                        else:
+                            continue
+
+    return errors
+
+
+@cython.boundscheck(False)
 def findExceed(np.ndarray[DTYPE_t, ndim=2] var,
                np.ndarray[DTYPE2_t, ndim=2] mask,
                float thresh,
