@@ -71,10 +71,8 @@ def error_composite(np.ndarray[DTYPE_t, ndim=2] fcst,
 
     ng = int(radius / dx)
     sqng = float(ng * ng)
-    ngn = -1 * ng
     nx = 2*ng+1
     ny = 2*ng+1
-    nw=0
 
     cdef np.ndarray[DTYPE_t, ndim=2] errors = np.zeros([nx, ny], dtype=DTYPE)
 
