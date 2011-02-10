@@ -122,6 +122,35 @@ def findExceed(np.ndarray[DTYPE64_t, ndim=2] var,
 
 
 @cython.boundscheck(False)
+def find_joint_exceed(np.ndarray[DTYPE64_t, ndim=2] var1,
+                      np.ndarray[DTYPE64_t, ndim=2] var2,
+                      np.ndarray[DTYPE_t, ndim=2] mask,
+                      float thresh1, float thresh2,
+                      int missing = 9999):
+
+    cdef unsigned int ii = var1.shape[0]
+    cdef unsigned int jj = var1.shape[1]
+    cdef Py_ssize_t i, j
+
+    cdef np.ndarray[DTYPE64_t, ndim=2] newvar1 = np.zeros([ii, jj], dtype=DTYPE64)
+    cdef np.ndarray[DTYPE64_t, ndim=2] newvar2 = np.zeros([ii, jj], dtype=DTYPE64)
+
+    for i in range(ii):
+        for j in range(jj):
+            if (mask[i,j] == 0 or mask[i,j] == missing or var1[i,j] == missing 
+                or var2[i,j] == missing):
+                    newvar1[i,j] = 0
+                    newvar2[i,j] = 0
+                    continue
+            if var1[i,j] > thresh1:
+                newvar1[i,j] = 1
+            if var2[i,j] > thresh2:
+                newvar2[i,j] = 1
+
+    return(newvar1, newvar2)
+
+
+@cython.boundscheck(False)
 def findRegionalExceed(np.ndarray[DTYPE64_t, ndim=2] var,
                        np.ndarray[DTYPE64_t, ndim=2] thresh,
                        np.ndarray[DTYPE_t, ndim=2] mask,
