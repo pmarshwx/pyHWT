@@ -102,7 +102,7 @@ def generic_smoother(np.ndarray[DTYPE64_t, ndim=2] data,
                         jjj = j + jj + nhny
                         if jjj < 0 or jjj >= vlength or iii < 0 or iii >= ulength:
                             continue
-                        frc_data[iii,jjj] += data[iii,jjj]*smoother[ii,jj]
+                        frc_data[iii,jjj] += data[i,j]*smoother[ii,jj]
 
 
     return frc_data
