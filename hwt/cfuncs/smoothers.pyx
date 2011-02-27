@@ -8,15 +8,15 @@ cdef extern from 'math.h':
     float exp(float x)
 
 
-DTYPE = np.float64
-ctypedef np.float64_t DTYPE_t
+DTYPE64 = np.float64
+ctypedef np.float64_t DTYPE64_t
 
 
 
 
 @cython.boundscheck(False)
 @cython.cdivision(True)
-def gaussian(np.ndarray[DTYPE_t, ndim=2] data, 
+def gaussian(np.ndarray[DTYPE64_t, ndim=2] data, 
              float sig, 
              float dx,
              float factor):
@@ -29,8 +29,8 @@ def gaussian(np.ndarray[DTYPE_t, ndim=2] data,
     cdef Py_ssize_t i, j, ii, jj, nxx, nyy
     cdef float PI=3.141592653589793
 
-    cdef np.ndarray[DTYPE_t, ndim=2] frc_data = np.zeros([ulength, vlength], dtype=DTYPE)
-    cdef np.ndarray[DTYPE_t, ndim=1] partweight = np.zeros([ulength*vlength], dtype=DTYPE)
+    cdef np.ndarray[DTYPE64_t, ndim=2] frc_data = np.zeros([ulength, vlength], dtype=DTYPE64)
+    cdef np.ndarray[DTYPE64_t, ndim=1] partweight = np.zeros([ulength*vlength], dtype=DTYPE64)
     
     
     sigma = sig/dx
@@ -71,3 +71,39 @@ def gaussian(np.ndarray[DTYPE_t, ndim=2] data,
                             
     return frc_data
                     
+
+@cython.boundscheck(False)
+@cython.cdivision(True)
+def generic_smoother(np.ndarray[DTYPE64_t, ndim=2] data, 
+                     np.ndarray[DTYPE64_t, ndim=2] smoother):
+
+    cdef unsigned int ulength = data.shape[0]
+    cdef unsigned int vlength = data.shape[1]
+    cdef unsigned int nx, ny, hnx, hny
+    cdef int nhnx, nhny, iii, jjj
+    cdef Py_ssize_t i, j, ii, jj
+
+    cdef np.ndarray[DTYPE64_t, ndim=2] frc_data = np.zeros_like(data)
+
+    nx = smoother.shape[0]
+    ny = smoother.shape[0]
+    hnx = int(float(nx/2) + 0.5)
+    nhnx = -1 * hnx
+    hny = int(float(ny/2) + 0.5)
+    nhny = -1 * hny
+    
+
+    for i in range(0, ulength):
+        for j in range(0, vlength):
+            if data[i,j] > 0:
+                for ii in range(nhnx, hnx):
+                    for jj in range(nhny, hny):
+                        iii = i + ii + nhnx
+                        jjj = j + jj + nhny
+                        if jjj < 0 or jjj >= vlength or iii < 0 or iii >= ulength:
+                            continue
+                        frc_data[iii,jjj] += data[iii,jjj]*smoother[ii,jj]
+
+
+    return frc_data
+
