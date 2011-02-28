@@ -43,8 +43,8 @@ def gaussian(np.ndarray[DTYPE_t, ndim=2] data,
     ny = 2*ng+1
     nw=0
     
-    for nxx in range(ngn, ng+1):
-        for nyy in range(ngn, ng+1):
+    for nxx in range(ngn, ng):
+        for nyy in range(ngn, ng):
             nw = nw+1
             distsq = float(nxx*nxx) + float(nyy*nyy)
             if distsq <= sqng:
