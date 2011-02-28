@@ -55,13 +55,13 @@ def gaussian(np.ndarray[DTYPE_t, ndim=2] data,
             #print i, j
             if data[i,j] > 0:
                 amp = data[i,j] / (2*PI*sigmasq)
-                jw=j-ng
-                je=j+ng
-                isouth=i-ng
-                inorth=i+ng
+                iw=i-ng
+                ie=i+ng
+                jsouth=j-ng
+                jnorth=j+ng
                 nw=0
-                for ii in range(isouth,inorth):
-                    for jj in range(jw, je):
+                for ii in range(iw, ie):
+                    for jj in range(jsouth, jnorth):
                         nw += 1
                         if jj < 0 or jj >= vlength or ii < 0 or ii >= ulength:
                             continue
