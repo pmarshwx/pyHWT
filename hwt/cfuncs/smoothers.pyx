@@ -62,8 +62,8 @@ def gaussian(np.ndarray[DTYPE64_t, ndim=2] data,
                 isouth=i-ng
                 inorth=i+ng
                 nw=0
-                for ii in range(isouth,inorth):
-                    for jj in range(jw, je):
+                for ii in range(isouth, inorth+1):
+                    for jj in range(jw, je+1):
                         nw += 1
                         if jj < 0 or jj >= vlength or ii < 0 or ii >= ulength:
                             continue
@@ -76,10 +76,10 @@ def gaussian(np.ndarray[DTYPE64_t, ndim=2] data,
 
 @cython.boundscheck(False)
 @cython.cdivision(True)
-def anisotropic_gauss(np.ndarray[DTYPE64_t, ndim=2] data, 
-                      float sigx, float sigy, float rot, 
-                      int h, int k, float dx, float factor, 
-                      sig_as_grid_points=False):
+cpdef anisotropic_gauss(np.ndarray[DTYPE64_t, ndim=2] data, 
+                        float sigx, float sigy, float rot, 
+                        int h, int k, float dx, float factor, 
+                        sig_as_grid_points=False):
 
     cdef unsigned int vlength = data.shape[0]
     cdef unsigned int ulength = data.shape[1]
