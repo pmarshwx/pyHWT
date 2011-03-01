@@ -1,6 +1,6 @@
 import os.path
 import subprocess
-release = False
+release = True
 __version__ = '0.2'
 
 
