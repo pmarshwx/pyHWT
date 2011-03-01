@@ -18,10 +18,10 @@ ctypedef np.float64_t DTYPE64_t
 
 @cython.boundscheck(False)
 @cython.cdivision(True)
-def gaussian(np.ndarray[DTYPE64_t, ndim=2] data, 
-             float sig, 
-             float dx,
-             float factor):
+def isotropic_gauss(np.ndarray[DTYPE64_t, ndim=2] data, 
+                    float sig, 
+                    float dx,
+                    float factor):
 
     cdef unsigned int ulength = data.shape[0]
     cdef unsigned int vlength = data.shape[1]
