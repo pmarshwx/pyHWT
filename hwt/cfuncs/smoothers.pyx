@@ -32,9 +32,7 @@ def isotropic_gauss(np.ndarray[DTYPE64_t, ndim=2] data,
     cdef float PI=3.141592653589793
 
     cdef np.ndarray[DTYPE64_t, ndim=2] frc_data = np.zeros([ulength, vlength], dtype=DTYPE64)
-    cdef np.ndarray[DTYPE64_t, ndim=1] partweight = np.zeros([ulength*vlength], dtype=DTYPE64)
-    
-    
+        
     sig = sig/dx
     sig_sq = sig*sig
 
@@ -44,7 +42,10 @@ def isotropic_gauss(np.ndarray[DTYPE64_t, ndim=2] data,
     nx = 2*ng+1
     ny = 2*ng+1
     nw=0
-    
+
+    cdef np.ndarray[DTYPE64_t, ndim=1] partweight = np.zeros([nx*ny], dtype=DTYPE64)
+
+
     for nyy in range(ngn, ng+1):
         for nxx in range(ngn, ng+1):
             nw = nw+1
