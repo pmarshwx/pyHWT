@@ -4,22 +4,22 @@ cimport numpy as np
 cimport cython
 
 
-DTYPE = np.float64
-ctypedef np.float64_t DTYPE_t
+DTYPE = np.int
+ctypedef np.int_t DTYPE_t
 
-DTYPE2 = np.int
-ctypedef np.int_t DTYPE2_t
+DTYPE2 = np.double
+ctypedef np.double_t DTYPE2_t
 
-DTYPE4 = np.double
-ctypedef np.double_t DTYPE4_t
+DTYPE64 = np.float64
+ctypedef np.float64_t DTYPE64_t
 
 
 
 
 @cython.boundscheck(False)
-def reliability(np.ndarray[DTYPE2_t, ndim=2] fcst,
-                np.ndarray[DTYPE2_t, ndim=2] obs,
-                np.ndarray[DTYPE2_t, ndim=2] mask,
+def reliability(np.ndarray[DTYPE_t, ndim=2] fcst,
+                np.ndarray[DTYPE_t, ndim=2] obs,
+                np.ndarray[DTYPE_t, ndim=2] mask,
                 unsigned int asize):
 
     cdef unsigned int ii = fcst.shape[0]
@@ -35,8 +35,8 @@ def reliability(np.ndarray[DTYPE2_t, ndim=2] fcst,
     # last value so we must add another element to have a position for the last
     # element. Thus, we have to add 2 additional elements to account for 
     # everything
-    cdef np.ndarray[DTYPE4_t, ndim=1] fhist = np.zeros(asize+2, dtype=DTYPE4)
-    cdef np.ndarray[DTYPE4_t, ndim=1] ohist = np.zeros(asize+2, dtype=DTYPE4)
+    cdef np.ndarray[DTYPE2_t, ndim=1] fhist = np.zeros(asize+2, dtype=DTYPE2)
+    cdef np.ndarray[DTYPE2_t, ndim=1] ohist = np.zeros(asize+2, dtype=DTYPE2)
 
     cdef unsigned int iii, jjj
     
@@ -62,8 +62,8 @@ def reliability(np.ndarray[DTYPE2_t, ndim=2] fcst,
 
 @cython.boundscheck(False)
 @cython.cdivision(True)
-def getContingency(np.ndarray[DTYPE_t, ndim=2] fcst, 
-                   np.ndarray[DTYPE_t, ndim=2] obs):
+def get_contingency(np.ndarray[DTYPE64_t, ndim=2] fcst, 
+                    np.ndarray[DTYPE64_t, ndim=2] obs):
 
     cdef unsigned int ulength = fcst.shape[0]
     cdef unsigned int vlength = fcst.shape[1]
