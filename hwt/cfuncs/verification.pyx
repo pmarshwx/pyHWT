@@ -69,8 +69,8 @@ def get_contingency(np.ndarray[DTYPE64_t, ndim=2] fcst,
                     np.ndarray[DTYPE_t, ndim=2] mask,
                     int missing = 9999):
 
-    cdef unsigned int ulength = fcst.shape[0]
-    cdef unsigned int vlength = fcst.shape[1]
+    cdef unsigned int ii = fcst.shape[0]
+    cdef unsigned int jj = fcst.shape[1]
     cdef unsigned int a, b, c, d
     cdef Py_ssize_t i, j
     
