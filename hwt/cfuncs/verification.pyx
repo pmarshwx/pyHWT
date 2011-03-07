@@ -65,7 +65,9 @@ def reliability(np.ndarray[DTYPE_t, ndim=2] fcst,
 @cython.boundscheck(False)
 @cython.cdivision(True)
 def get_contingency(np.ndarray[DTYPE64_t, ndim=2] fcst, 
-                    np.ndarray[DTYPE64_t, ndim=2] obs):
+                    np.ndarray[DTYPE64_t, ndim=2] obs,
+                    np.ndarray[DTYPE_t, ndim=2] mask,
+                    int missing = 9999):
 
     cdef unsigned int ulength = fcst.shape[0]
     cdef unsigned int vlength = fcst.shape[1]
@@ -77,9 +79,12 @@ def get_contingency(np.ndarray[DTYPE64_t, ndim=2] fcst,
     c = 0
     d = 0
     
-    for i in range(0, ulength):
-        for j in range(0,vlength):
-            if fcst[i,j] == 1:
+    for i in range(ii):
+        for j in range(jj):
+            if (mask[i,j] == 0 or mask[i,j] == missing or fcst[i,j] == missing
+                or obs[i,j] = missing):
+                    continue
+            elif fcst[i,j] == 1:
                 if obs[i,j] == 1:
                     a += 1
                 else:
