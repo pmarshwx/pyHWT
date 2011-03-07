@@ -20,7 +20,7 @@ ctypedef np.float64_t DTYPE64_t
 def reliability(np.ndarray[DTYPE_t, ndim=2] fcst,
                 np.ndarray[DTYPE_t, ndim=2] obs,
                 np.ndarray[DTYPE_t, ndim=2] mask,
-                unsigned int asize
+                unsigned int asize,
                 int missing = 9999):
 
     cdef unsigned int ii = fcst.shape[0]
