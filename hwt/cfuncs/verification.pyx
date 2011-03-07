@@ -44,7 +44,7 @@ def reliability(np.ndarray[DTYPE_t, ndim=2] fcst,
     for i in range(ii):
         for j in range(jj):
             if (mask[i,j] == 0 or mask[i,j] == missing or fcst[i,j] == missing
-                or obs[i,j] = missing):
+                or obs[i,j] == missing):
                     continue
             elif fcst[i,j] < 0:
                 fhist[0] += 1
@@ -82,7 +82,7 @@ def get_contingency(np.ndarray[DTYPE64_t, ndim=2] fcst,
     for i in range(ii):
         for j in range(jj):
             if (mask[i,j] == 0 or mask[i,j] == missing or fcst[i,j] == missing
-                or obs[i,j] = missing):
+                or obs[i,j] == missing):
                     continue
             elif fcst[i,j] == 1:
                 if obs[i,j] == 1:
