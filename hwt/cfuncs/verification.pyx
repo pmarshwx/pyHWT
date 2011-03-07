@@ -20,7 +20,8 @@ ctypedef np.float64_t DTYPE64_t
 def reliability(np.ndarray[DTYPE_t, ndim=2] fcst,
                 np.ndarray[DTYPE_t, ndim=2] obs,
                 np.ndarray[DTYPE_t, ndim=2] mask,
-                unsigned int asize):
+                unsigned int asize
+                int missing = 9999):
 
     cdef unsigned int ii = fcst.shape[0]
     cdef unsigned int jj = fcst.shape[1]
@@ -42,8 +43,9 @@ def reliability(np.ndarray[DTYPE_t, ndim=2] fcst,
     
     for i in range(ii):
         for j in range(jj):
-            if mask[i,j] == 0 or mask[i,j] == 9999:
-                continue
+            if (mask[i,j] == 0 or mask[i,j] == missing or fcst[i,j] == missing
+                or obs[i,j] = missing):
+                    continue
             elif fcst[i,j] < 0:
                 fhist[0] += 1
                 ohist[0] += obs[i,j]
