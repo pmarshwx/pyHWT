@@ -1,15 +1,2 @@
 README
 LICENSE
-setup.py
-hwt/__git_version__.py
-hwt/__init__.py
-hwt/test.py
-hwt/version.py
-hwt/cfuncs/__init__.py
-hwt/cfuncs/bin.pyx
-hwt/cfuncs/neighborhood.pyx
-hwt/cfuncs/smoothers.pyx
-hwt/cfuncs/verification.pyx
-hwt/plot/__init__.py
-hwt/plot/ctables.py
-hwt/plot/funcs.py
