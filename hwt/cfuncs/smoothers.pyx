@@ -1,7 +1,6 @@
-import Cython
+cimport cython
 import numpy as np
 cimport numpy as np
-cimport cython
 
 
 cdef extern from 'math.h':
@@ -9,6 +8,14 @@ cdef extern from 'math.h':
     float cos(float x)
     float sin(float x)
 
+cdef float exp(float x):
+    return exp(x)
+
+cdef float cos(float x):
+    return cos(x)
+    
+cdef float sin(float x):
+    return sin(x)
 
 DTYPE64 = np.float64
 ctypedef np.float64_t DTYPE64_t
