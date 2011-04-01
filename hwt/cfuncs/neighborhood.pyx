@@ -1,7 +1,6 @@
-import Cython
+cimport cython
 import numpy as np
 cimport numpy as np
-cimport cython
 
 
 
@@ -65,7 +64,7 @@ def error_composite(np.ndarray[DTYPE_t, ndim=2] fcst,
     cdef unsigned int ulength = fcst.shape[0]
     cdef unsigned int vlength = fcst.shape[1]
     cdef unsigned int ng, nx, ny, iii, jjj
-    cdef int ngn
+    cdef int ngn, nw
     cdef float distsq, sqng
     cdef Py_ssize_t i, j, ii, jj, nxx, nyy
 
