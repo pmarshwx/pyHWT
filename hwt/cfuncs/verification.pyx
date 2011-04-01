@@ -1,7 +1,6 @@
-import Cython
+cimport cython
 import numpy as np
 cimport numpy as np
-cimport cython
 
 
 DTYPE = np.int
