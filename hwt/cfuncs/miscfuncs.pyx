@@ -1,6 +1,5 @@
-import Cython
-import numpy as np
 cimport cython
+import numpy as np
 cimport numpy as np
 
 
