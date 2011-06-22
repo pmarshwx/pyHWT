@@ -211,7 +211,7 @@ def epanechnikov(np.ndarray[DTYPE64_t, ndim=2] data, float bandwidth,
                         nw += 1
                         if jj < 0 or jj >= vlength or ii < 0 or ii >= ulength:
                             continue
-                        frc_data[jj,ii] = frc_data[jj,ii] + partweight[nw]
+                        frc_data[jj,ii] = frc_data[jj,ii] + data[j,i]*partweight[nw]
     return frc_data
 
 

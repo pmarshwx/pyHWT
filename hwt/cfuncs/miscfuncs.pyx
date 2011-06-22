@@ -22,18 +22,19 @@ cdef extern from 'math.h':
 def grid_data(np.ndarray[DTYPE64_t, ndim=2] mlons,
               np.ndarray[DTYPE64_t, ndim=2] mlats,
               np.ndarray[DTYPE64_t, ndim=1] ilon,
-              np.ndarray[DTYPE64_t, ndim=1] ilat):
+              np.ndarray[DTYPE64_t, ndim=1] ilat,
+              float dx):
 
     cdef float PI = 3.14159265
     cdef float RADIUS = 3956.0
     cdef float PI_4_DEG2RAD = PI/180.0
     cdef float PI_4_RAD2DEG = 180.0/PI
-    cdef float NM2MI = 69.0467669
+    cdef float NM2KM = 69.0467669*1.609344
 
     cdef unsigned int kk = ilon.shape[0]
     cdef unsigned int jj = mlons.shape[1]
     cdef unsigned int ii = mlons.shape[0]
-    cdef float min_dist
+    cdef float min_dist, hdx
     cdef float c, x
     cdef Py_ssize_t i, j, k
 
@@ -44,6 +45,7 @@ def grid_data(np.ndarray[DTYPE64_t, ndim=2] mlons,
     cdef np.ndarray[DTYPE_t, ndim=1] xinds = np.zeros([kk], dtype=DTYPE)
     cdef np.ndarray[DTYPE_t, ndim=1] yinds = np.zeros([kk], dtype=DTYPE)
 
+    hdx = dx / 2.0
     for k in range(kk):
         rilat[k] = ilat[k] * PI_4_DEG2RAD
 
@@ -54,24 +56,23 @@ def grid_data(np.ndarray[DTYPE64_t, ndim=2] mlons,
     for k in range(kk):
         if k % 50 == 0: print k
         min_dist = 99999.0
-        for j in range(jj):
-            for i in range(ii):
+        for i in range(ii):
+            for j in range(jj):
                 c = (ilon[k]-mlons[i,j]) * PI_4_DEG2RAD
                 x = (sinf(rlat[i,j]) * sinf(rilat[k]) + cosf(rlat[i,j]) *
                         cosf(rilat[k]) * cosf(c))
-                dist[i,j] = acosf(x) * PI_4_RAD2DEG * NM2MI
+                dist[i,j] = acosf(x) * PI_4_RAD2DEG * NM2KM
                 if dist[i,j] < min_dist:
                     min_dist = dist[i,j]
                     xinds[k] = i
                     yinds[k] = j
+                    if min_dist <= hdx:
+                        break
+            if min_dist <= hdx:
+                break
         grid[xinds[k], yinds[k]] += 1
 
     return (grid, xinds, yinds)
-
-
-
-
-
 
 
 
