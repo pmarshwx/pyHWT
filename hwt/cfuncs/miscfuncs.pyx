@@ -19,11 +19,11 @@ cdef extern from 'math.h':
 
 
 @cython.boundscheck(False)
-def grid_data(np.ndarray[DTYPE64_t, ndim=2] mlons,
-              np.ndarray[DTYPE64_t, ndim=2] mlats,
-              np.ndarray[DTYPE64_t, ndim=1] ilon,
-              np.ndarray[DTYPE64_t, ndim=1] ilat,
-              float dx):
+def geo_grid_data(np.ndarray[DTYPE64_t, ndim=1] ilon,
+                  np.ndarray[DTYPE64_t, ndim=1] ilat,
+                  np.ndarray[DTYPE64_t, ndim=2] mlons,
+                  np.ndarray[DTYPE64_t, ndim=2] mlats,
+                  float dx):
 
     cdef float PI = 3.14159265
     cdef float RADIUS = 3956.0
@@ -75,7 +75,43 @@ def grid_data(np.ndarray[DTYPE64_t, ndim=2] mlons,
     return (grid, xinds, yinds)
 
 
+@cython.boundscheck(False)
+def grid_data(np.ndarray[DTYPE64_t, ndim=1] xvals,
+              np.ndarray[DTYPE64_t, ndim=1] yvals,
+              np.ndarray[DTYPE64_t, ndim=2] xpts,
+              np.ndarray[DTYPE64_t, ndim=2] ypts,
+              float dx=1.):
 
+    cdef unsigned int kk = xvals.shape[0]
+    cdef unsigned int jj = xpts.shape[1]
+    cdef unsigned int ii = ypts.shape[0]
+    cdef float min_dist, hdx
+    cdef Py_ssize_t i, j, k
+
+    cdef np.ndarray[DTYPE64_t, ndim=2] dist = np.zeros([ii,jj], dtype=DTYPE64)
+    cdef np.ndarray[DTYPE64_t, ndim=2] grid = np.zeros([ii,jj], dtype=DTYPE64)
+    cdef np.ndarray[DTYPE_t, ndim=1] xinds = np.zeros([kk], dtype=DTYPE)
+    cdef np.ndarray[DTYPE_t, ndim=1] yinds = np.zeros([kk], dtype=DTYPE)
+
+    hdx = dx / 2.0
+    for k in range(kk):
+        if k % 1000 == 0: print k
+        min_dist = 99999.0
+        for i in range(ii):
+            for j in range(jj):
+                dist[i,j] = (xvals[k]-xpts[i,j])**2 + (yvals[k]-ypts[i,j])**2
+                dist[i,j] = dist[i,j]**0.5
+                if dist[i,j] < min_dist:
+                    min_dist = dist[i,j]
+                    xinds[k] = i
+                    yinds[k] = j
+                    if min_dist <= hdx:
+                        break
+            if min_dist <= hdx:
+                break
+        grid[xinds[k], yinds[k]] += 1
+
+    return (grid, xinds, yinds)
 
 
 @cython.boundscheck(False)
