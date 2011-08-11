@@ -12,6 +12,35 @@ DTYPE64 = np.float64
 ctypedef np.float64_t DTYPE64_t
 
 
+@cython.boundscheck(False)
+@cython.cdivision(True)
+def hist_smoothing(np.ndarray[DTYPE64_t, ndim=2] data,
+                   np.ndarray[DTYPE64_t, ndim=2] hist):
+
+    cdef unsigned int vlength = data.shape[0]
+    cdef unsigned int ulength = data.shape[1]
+    cdef int iw, ie, js, jn, ng, nw, iii, jjj
+    cdef float amp
+    cdef Py_ssize_t i, j, ii, jj
+
+    cdef np.ndarray[DTYPE64_t, ndim=2] frc_data = np.zeros([vlength, ulength],
+        dtype=DTYPE64)
+
+    ng = int(hist.shape[0] / 2.)
+
+    for j in range(0, vlength):
+        for i in range(0, ulength):
+            if data[j,i] > 0:
+                for jj in range(-ng, ng+1):
+                    jjj = j+jj
+                    if jjj < 0 or jjj >= vlength: continue
+                    for ii in range(-ng, ng+1):
+                        iii = i+ii
+                        if iii < 0 or iii >= ulength: continue
+                        frc_data[jjj,iii] += data[j,i] * hist[jj+ng,ii+ng]
+
+
+    return frc_data
 
 
 @cython.boundscheck(False)
