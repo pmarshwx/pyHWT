@@ -35,7 +35,7 @@ def corrected_ensemble(np.ndarray[DTYPE64_t, ndim=3] members, float thresh):
     cdef unsigned int jj = members.shape[2]
     cdef unsigned int ind = 0
     cdef float mean, sigma, mu, beta, diffs, PI, EULER, SQRT6
-    cdef float prob1, prob2
+    cdef float prob1, prob2, mval
     cdef np.ndarray[DTYPE64_t, ndim=1] vals = np.zeros([kk], dtype=DTYPE64)
     cdef np.ndarray[DTYPE64_t, ndim=1] rh = np.zeros([kk+1], dtype=DTYPE64)
     cdef np.ndarray[DTYPE64_t, ndim=2] probs = np.zeros([ii,jj], dtype=DTYPE64)
@@ -52,12 +52,17 @@ def corrected_ensemble(np.ndarray[DTYPE64_t, ndim=3] members, float thresh):
         for 0 <= j < jj:
             prob1 = 0.
             prob2 = 0.
+            mval = 0.
             for 0 <= k < kk:
                 vals[k] = members[k,i,j]
+                if vals[k] > mval: mval = vals[k]
             vals.sort()
 
+            if mval == 0:
+                probs[i,j] = 0
+
             # Create Ensemble Probabilities Less Than Envelope
-            if thresh < vals[0]:
+            elif thresh < vals[0]:
                 probs[i,j] = linear_interp(thresh, 0., vals[0], 0., rh[0])
 
             # Create Ensemble Probabilities In Envelope
@@ -96,7 +101,7 @@ def corrected_ensemble(np.ndarray[DTYPE64_t, ndim=3] members, float thresh):
                 probs[i,j] = rh[-1] - ((prob1-prob2)/(1.0-prob2)*rh[-1])
 
             probs[i,j] *= 100.
-
+            if probs[i,j] < 0: probs[i,j] = 0
     return probs
 
 
