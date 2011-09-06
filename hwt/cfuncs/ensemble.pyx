@@ -18,6 +18,7 @@ ctypedef np.float64_t DTYPE64_t
 @cython.cdivision(True)
 cpdef float cdf(float x, float mu, float beta):
     cdef float z
+    if beta == 0.0: beta = 1e-30
     z = -(x-mu)/beta
     return exp(-exp(z))
 
