@@ -76,8 +76,7 @@ def corrected_ensemble(np.ndarray[DTYPE64_t, ndim=3] members, float thresh):
                 else:
                     for 0 <= v <= ind:
                         prob1 += rh[v]
-                        prob2 += rh[v]
-                    prob2 += rh[v+1]
+                    prob2 = prob1 + rh[v+1]
                     probs[i,j] = linear_interp(thresh, vals[ind], vals[ind+1],
                         prob1, prob2)
 
@@ -99,7 +98,6 @@ def corrected_ensemble(np.ndarray[DTYPE64_t, ndim=3] members, float thresh):
                 prob1 = cdf(thresh, mu, beta)
                 prob2 = cdf(vals[-1], mu, beta)
                 probs[i,j] = rh[-1] - ((prob1-prob2)/(1.0-prob2)*rh[-1])
-
             probs[i,j] *= 100.
             if probs[i,j] < 0: probs[i,j] = 0
     return probs
