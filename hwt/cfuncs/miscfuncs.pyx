@@ -288,5 +288,101 @@ def layer_sum(np.ndarray[DTYPE32_t, ndim=4] uhfull,
     return uh
 
 
+@cython.boundscheck(False)
+def layer_sum_3D(np.ndarray[DTYPE32_t, ndim=3] uhfull,
+                 np.ndarray[DTYPE32_t, ndim=3] z,
+                 float zbot = 2000., float ztop = 5000.):
+
+    cdef unsigned int levs = uhfull.shape[0]
+    cdef unsigned int jj = uhfull.shape[1]
+    cdef unsigned int ii = uhfull.shape[2]
+
+    cdef float btop, bbot, btmp
+    cdef float ttop, tbot, ttmp
+    cdef float tnm1, tnm2, tnm3
+    cdef float bnm1, bnm2, bnm3
+    cdef float bval, tval
+
+    cdef np.ndarray[DTYPE32_t, ndim=2] uh = np.zeros([jj,ii], dtype=DTYPE32)
+    cdef Py_ssize_t bbptr, btptr
+    cdef Py_ssize_t tbptr, ttptr
+    cdef Py_ssize_t j, i, lev
+
+    for j in range(jj):
+        for i in range(ii):
+            # Find nearest indices
+            btop = 9999; ttop = 9999
+            bbot = -9999; tbot = -9999
+            btmp = -9999; ttmp = -9999
+            for lev in range(levs):
+                btmp = z[lev, j, i] - zbot
+                ttmp = z[lev, j, i] - ztop
+                # Find pointers for bottom level
+                if btmp < 0:
+                    if btmp > bbot:
+                        bbot = btmp
+                        bbptr = lev
+                elif btmp > 0:
+                    if btmp < btop:
+                        btop = btmp
+                        btptr = lev
+                else:
+                    bbot = btmp
+                    btop = btmp
+                    bbptr = lev
+                    btptr = lev
+
+                # Find pointers for top level
+                if ttmp < 0:
+                    if ttmp > tbot:
+                        tbot = ttmp
+                        tbptr = lev
+                elif ttmp > 0:
+                    if ttmp < ttop:
+                        ttop = ttmp
+                        ttptr = lev
+                else:
+                    tbot = ttmp
+                    ttop = ttmp
+                    tbptr = lev
+                    ttptr = lev
+
+            # Do bottom Interpolations
+            if bbptr == btptr:
+                bval = uhfull[bbptr,j,i]
+            else:
+                bbot = uhfull[bbptr,j,i]
+                btop = uhfull[btptr,j,i]
+                bnm1 = zbot - z[bbptr,j,i]
+                bnm2 = z[btptr,j,i] - z[bbptr,j,i]
+                bnm3 = bnm1 / bnm2
+                bval = bbot + bnm3 * (btop - bbot)
+
+            # Do top Interpolations
+            if tbptr == ttptr:
+                tval = uhfull[tbptr,j,i]
+            else:
+                tbot = uhfull[tbptr,j,i]
+                ttop = uhfull[ttptr,j,i]
+                tnm1 = ztop - z[tbptr,j,i]
+                tnm2 = z[ttptr,j,i] - z[tbptr,j,i]
+                tnm3 = tnm1 / tnm2
+                tval = tbot + tnm3 * (ttop - tbot)
+
+
+            for lev in range(btptr, ttptr+1):
+                if lev == btptr:
+                    uh[j,i] += 0.5 * (bval + uhfull[lev,j,i]) * (z[lev,j,i] - zbot)
+                elif lev == ttptr:
+                    uh[j,i] += 0.5 * (tval + uhfull[lev,j,i]) * (ztop - z[lev,j,i])
+                else:
+                    uh[j,i] += (0.5 * (uhfull[lev,j,i]+uhfull[lev+1,j,i]) *
+                                 (z[lev+1,j,i]-z[lev,j,i]))
+            uh[j,i] += tval
+    return uh
+
+
+
+
 
 
