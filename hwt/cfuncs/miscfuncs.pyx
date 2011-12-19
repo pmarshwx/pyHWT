@@ -275,16 +275,17 @@ def layer_sum(np.ndarray[DTYPE32_t, ndim=4] uhfull,
                     tnm3 = tnm1 / tnm2
                     tval = tbot + tnm3 * (ttop - tbot)
 
+                if bbptr != btptr:
+                    uh[k,j,i] += (0.5 * (bval + uhfull[k,btptr,j,i]) *
+                        (z[k,btptr,j,i] - zbot))
 
-                for lev in range(btptr, ttptr+1):
-                    if lev == btptr:
-                        uh[k,j,i] += 0.5 * (bval + uhfull[k,lev,j,i]) * (z[k,lev,j,i] - zbot)
-                    elif lev == ttptr:
-                        uh[k,j,i] += 0.5 * (tval + uhfull[k,lev,j,i]) * (ztop - z[k,lev,j,i])
-                    else:
-                        uh[k,j,i] += (0.5 * (uhfull[k,lev,j,i]+uhfull[k,lev+1,j,i]) *
-                                     (z[k,lev+1,j,i]-z[k,lev,j,i]))
-                uh[k,j,i] += tval
+                for lev in range(btptr, tbptr):
+                    uh[k,j,i] += (0.5 * (uhfull[k,lev,j,i] +
+                        uhfull[k,lev+1,j,i]) * (z[k,lev+1,j,i] - z[k,lev,j,i]))
+
+                if tbptr != ttptr:
+                    uh[k,j,i] += (0.5 * (uhfull[k,tbptr,j,i] + tval) * (ztop -
+                        z[k,tbptr,j,i]))
     return uh
 
 
@@ -301,7 +302,7 @@ def layer_sum_3D(np.ndarray[DTYPE32_t, ndim=3] uhfull,
     cdef float ttop, tbot, ttmp
     cdef float tnm1, tnm2, tnm3
     cdef float bnm1, bnm2, bnm3
-    cdef float bval, tval
+    cdef float bval, tval, a
 
     cdef np.ndarray[DTYPE32_t, ndim=2] uh = np.zeros([jj,ii], dtype=DTYPE32)
     cdef Py_ssize_t bbptr, btptr
@@ -369,16 +370,17 @@ def layer_sum_3D(np.ndarray[DTYPE32_t, ndim=3] uhfull,
                 tnm3 = tnm1 / tnm2
                 tval = tbot + tnm3 * (ttop - tbot)
 
+            if bbptr != btptr:
+                uh[j,i] += (0.5 * (bval + uhfull[btptr,j,i]) *
+                    (z[btptr,j,i] - zbot))
 
-            for lev in range(btptr, ttptr+1):
-                if lev == btptr:
-                    uh[j,i] += 0.5 * (bval + uhfull[lev,j,i]) * (z[lev,j,i] - zbot)
-                elif lev == ttptr:
-                    uh[j,i] += 0.5 * (tval + uhfull[lev,j,i]) * (ztop - z[lev,j,i])
-                else:
-                    uh[j,i] += (0.5 * (uhfull[lev,j,i]+uhfull[lev+1,j,i]) *
-                                 (z[lev+1,j,i]-z[lev,j,i]))
-            uh[j,i] += tval
+            for lev in range(btptr, tbptr):
+                uh[j,i] += (0.5 * (uhfull[lev,j,i] + uhfull[lev+1,j,i]) *
+                    (z[lev+1,j,i] - z[lev,j,i]))
+
+            if tbptr != ttptr:
+                uh[j,i] += (0.5 * (uhfull[tbptr,j,i] + tval) *
+                    (ztop - z[tbptr,j,i]))
     return uh
 
 
