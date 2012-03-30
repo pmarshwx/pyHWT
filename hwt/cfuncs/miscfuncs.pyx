@@ -19,6 +19,56 @@ cdef extern from 'math.h':
 
 
 @cython.boundscheck(False)
+@cython.cdivision(True)
+def point_in_poly(np.ndarray[DTYPE64_t, ndim=1] xverts,
+                  np.ndarray[DTYPE64_t, ndim=1] yverts,
+                  np.ndarray[DTYPE64_t, ndim=2] xpts,
+                  np.ndarray[DTYPE64_t, ndim=2] ypts,
+                  np.ndarray[DTYPE64_t, ndim=2] grid,
+                  int mini, int maxi, int minj, int maxj):
+    '''
+    Determine if a point is inside a given polygon or not
+    Polygon is a list of (x,y) pairs. This fuction
+    returns True or False.  The algorithm is called
+    "Ray Casting Method".
+    '''
+
+    cdef unsigned int n = xverts.shape[0]
+    cdef int inside = 0
+    cdef float p2x, p1x = xverts[0]
+    cdef float p2y, p1y = yverts[0]
+    cdef float x, y, xinters
+    cdef unsigned int i, j, k
+
+    if mini < 0: mini = 0
+    if maxi >= xpts.shape[1]: maxi = xpts.shape[1]
+    if minj < 0: minj = 0
+    if maxj >= ypts.shape[0]: maxj = ypts.shape[0]
+
+    for i from minj <= i < maxj:
+        for j from mini <= j < maxi:
+            x = xpts[i,j]
+            y = ypts[i,j]
+            inside = 0
+            for k in range(n+1):
+                p2x = xverts[k % n]
+                p2y = yverts[k % n]
+                if y > min(p1y, p2y):
+                    if y <= max(p1y, p2y):
+                        if x <= max(p1x, p2x):
+                            if p1y != p2y:
+                                xinters = (y-p1y)*(p2x-p1x)/(p2y-p1y)+p1x
+                                if p1x == p2x or x <= xinters:
+                                    inside += 1
+                p1x, p1y = p2x, p2y
+            if inside % 2 == 1: grid[i, j] += 1
+    return grid
+
+
+
+
+
+@cython.boundscheck(False)
 def geo_grid_data(np.ndarray[DTYPE64_t, ndim=1] ilon,
                   np.ndarray[DTYPE64_t, ndim=1] ilat,
                   np.ndarray[DTYPE64_t, ndim=2] mlons,
