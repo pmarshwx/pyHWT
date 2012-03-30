@@ -40,7 +40,6 @@ def reliability(np.ndarray[DTYPE_t, ndim=2] fcst,
 
     for i in range(ii):
         for j in range(jj):
-            print i, j, fcst[i,j], obs[i,j]
             if (mask[i,j] == 0 or mask[i,j] == missing or fcst[i,j] == missing
                 or obs[i,j] == missing):
                     continue
