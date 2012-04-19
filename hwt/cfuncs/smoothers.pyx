@@ -171,7 +171,7 @@ cpdef anisotropic_gauss(np.ndarray[DTYPE64_t, ndim=2] data,
 
     for j in range(0, vlength):
         for i in range(0, ulength):
-            if data[j,i] > 0:
+            if data[j,i] != 0:
                 amp = data[j,i] / (2*PI*sigx*sigy)
                 iw=i-nxy
                 ie=i+nxy
