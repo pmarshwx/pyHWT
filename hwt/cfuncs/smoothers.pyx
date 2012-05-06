@@ -2,11 +2,11 @@ cimport cython
 import numpy as np
 cimport numpy as np
 
-
 cdef extern from 'math.h':
     float exp(float x)
     float cos(float x)
     float sin(float x)
+    float fabs(float x)
 
 DTYPE64 = np.float64
 ctypedef np.float64_t DTYPE64_t
