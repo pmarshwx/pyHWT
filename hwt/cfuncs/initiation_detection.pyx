@@ -36,7 +36,7 @@ cpdef process(np.ndarray[DTYPE64_t, ndim=2] img0,
         int search_radius):
     cdef int dim0 = img0.shape[0]
     cdef int dim1 = img0.shape[1]
-    img1 = percent_filter(img1, dim0, dim1, 0.5, 1, 0.33, 1)
+    img1 = percent_filter(img1, dim0, dim1, 0.5, 1, 3, 1)
     aligned0 = _align_atob(img0, img1, dim0, dim1, object_threshold,
         search_radius)
     dilated0 = percent_filter(aligned0, dim0, dim1, 1.0, search_radius, 0,
