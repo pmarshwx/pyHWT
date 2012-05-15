@@ -36,9 +36,10 @@ cpdef process(np.ndarray[DTYPE64_t, ndim=2] img0,
         int search_radius):
     cdef int dim0 = img0.shape[0]
     cdef int dim1 = img0.shape[1]
+    img1 = percent_filter(img1, dim0, dim1, 0.5, 1, 0.33, 1)
     aligned0 = _align_atob(img0, img1, dim0, dim1, object_threshold,
         search_radius)
-    dilated0 = dilate(aligned0, dim0, dim1, 1.0, search_radius, 0,
+    dilated0 = percent_filter(aligned0, dim0, dim1, 1.0, search_radius, 0,
         search_radius)
     ci = compute_ci(aligned0, dilated0, img1, dim0, dim1,
         object_threshold, search_radius)
@@ -213,7 +214,7 @@ cpdef align(np.ndarray[DTYPE64_t, ndim=2] a, int dim0, int dim1, tuple warp):
 
 @cython.boundscheck(False)
 @cython.cdivision(True)
-cpdef dilate(np.ndarray[DTYPE64_t, ndim=2] data, int dim0, int dim1,
+cpdef percent_filter(np.ndarray[DTYPE64_t, ndim=2] data, int dim0, int dim1,
         float percent, int halfx, int min_fill, int halfy):
 
     cdef np.ndarray[DTYPE64_t, ndim=2] temp = np.zeros((dim0, dim1),
