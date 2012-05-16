@@ -92,7 +92,8 @@ cpdef align_atob(np.ndarray[DTYPE64_t, ndim=2] a,
         int miny, int maxy):
     # Maximizing overlap is the same as maximizing ongoing convection
     cdef float maxcsi = 0.1 # do not move echoes if resulting csi < this value
-    cdef int maxoverlap = 3 # If less than 3 pixels of overlap, likely to be speckle
+    cdef int maxoverlap = 3 # If less than 3 pixels of overlap, likely to be
+                            # speckle
     cdef int setbyoverlap = 0
     cdef float u = 0
     cdef float v = 0
