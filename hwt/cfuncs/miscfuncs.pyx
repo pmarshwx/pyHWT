@@ -104,7 +104,7 @@ def geo_grid_data(np.ndarray[DTYPE64_t, ndim=1] ilon,
             rlat[i,j] = mlats[i,j] * PI_4_DEG2RAD
 
     for k in range(kk):
-        if k % 50 == 0: print k
+        # if k % 50 == 0: print k
         min_dist = 99999.0
         for i in range(ii):
             for j in range(jj):
@@ -145,7 +145,7 @@ def grid_data(np.ndarray[DTYPE64_t, ndim=1] xvals,
 
     hdx = dx / 2.0
     for k in range(kk):
-        if k % 1000 == 0: print k
+        # if k % 1000 == 0: print k
         min_dist = 99999.0
         for i in range(ii):
             for j in range(jj):
