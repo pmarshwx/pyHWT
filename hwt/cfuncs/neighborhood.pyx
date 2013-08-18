@@ -41,7 +41,6 @@ def circle(np.ndarray[DTYPE64_t, ndim=2] data,
             isouth = i-ng
             inorth = i+ng + 1
             if data[i,j] >= thresh:
-                tmphit[i,j] = 1
                 for ii in range(isouth, inorth):
                     for jj in range(jw, je):
                         distsq = float(j-jj)**2 + float(i-ii)**2
@@ -81,7 +80,6 @@ def circle_sum(np.ndarray[DTYPE64_t, ndim=2] data,
             isouth = i-ng
             inorth = i+ng + 1
             if data[i,j] >= thresh:
-                tmphit[i,j] = data[i,j]
                 for ii in range(isouth, inorth):
                     for jj in range(jw, je):
                         distsq = float(j-jj)**2 + float(i-ii)**2
