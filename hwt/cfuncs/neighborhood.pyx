@@ -55,6 +55,46 @@ def circle(np.ndarray[DTYPE64_t, ndim=2] data,
 
 @cython.boundscheck(False)
 @cython.cdivision(True)
+def circle_expand(np.ndarray[DTYPE64_t, ndim=2] data,
+           float thresh,
+           float roi,
+           float dx):
+
+    cdef unsigned int ulength = data.shape[0]
+    cdef unsigned int vlength = data.shape[1]
+    cdef unsigned int ng
+    cdef int jw, je, isouth, inorth
+    cdef float rng, distsq, dist
+    cdef Py_ssize_t i, j, ii, jj
+
+    cdef np.ndarray[DTYPE64_t, ndim=2] hitmiss = np.zeros([ulength, vlength], dtype=DTYPE64)
+    cdef np.ndarray[DTYPE64_t, ndim=2] tmphit = np.zeros([ulength, vlength], dtype=DTYPE64)
+
+    rng = roi/dx
+    ng = int(rng)
+
+    for i in range(ulength):
+        for j in range(vlength):
+            jw = j-ng
+            je = j+ng + 1
+            isouth = i-ng
+            inorth = i+ng + 1
+            if data[i,j] >= thresh:
+                for ii in range(isouth, inorth):
+                    for jj in range(jw, je):
+                        distsq = float(j-jj)**2 + float(i-ii)**2
+                        dist = distsq**0.5
+                        if dist <= rng:
+                            if jw < 0 or je >= vlength or isouth < 0 or inorth >= ulength:
+                                continue
+                            if tmphit[ii, jj] < data[i,j]:
+                                tmphit[ii,jj] = data[i,j]
+
+    return tmphit
+
+
+@cython.boundscheck(False)
+@cython.cdivision(True)
 def circle_sum(np.ndarray[DTYPE64_t, ndim=2] data,
                float thresh,
                float roi,
