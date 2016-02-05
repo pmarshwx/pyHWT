@@ -100,9 +100,9 @@ def get_contingency(np.ndarray[DTYPE64_t, ndim=2] fcst,
 
 @cython.boundscheck(False)
 @cython.cdivision(True)
-def get_contingency_all(np.ndarray[DTYPE32_t, ndim=2] fcst,
-                        np.ndarray[DTYPE32_t, ndim=2] obs,
-                        np.ndarray[DTYPE32_t, ndim=1] bins,
+def get_contingency_all(np.ndarray[DTYPE64_t, ndim=2] fcst,
+                        np.ndarray[DTYPE64_t, ndim=2] obs,
+                        np.ndarray[DTYPE64_t, ndim=1] bins,
                         np.ndarray[DTYPE_t, ndim=2] mask,
                         int missing = 9999):
 
@@ -118,19 +118,19 @@ def get_contingency_all(np.ndarray[DTYPE32_t, ndim=2] fcst,
 
     for i in range(ii):
         for j in range(jj):
-            if (mask[i,j] == 0 or mask[i,j] == missing or fcst[i,j] == missing
+            if (mask[i,j] == 1 or mask[i,j] == missing or fcst[i,j] == missing
                 or obs[i,j] == missing):
                     continue
-            for k in range(kk):
+            for k in range(kk-1):
                 if fcst[i,j] >= bins[k] and fcst[i,j] < bins[k+1]:
                     if obs[i,j] > 0:
-                        a[kk] += 1
+                        a[k] += 1
                     else:
-                        b[kk] += 1
+                        b[k] += 1
                 else:
                     if obs[i,j] > 0:
-                        c[kk] += 1
+                        c[k] += 1
                     else:
-                        d[kk] += 1
+                        d[k] += 1
 
     return (a, b, c, d)
