@@ -9,6 +9,9 @@ ctypedef np.int_t DTYPE_t
 DTYPE2 = np.double
 ctypedef np.double_t DTYPE2_t
 
+DTYPE32 = np.float32
+ctypedef np.float32_t DTYPE32_t
+
 DTYPE64 = np.float64
 ctypedef np.float64_t DTYPE64_t
 
@@ -91,5 +94,41 @@ def get_contingency(np.ndarray[DTYPE64_t, ndim=2] fcst,
                     c += 1
                 else:
                     d += 1
+
+    return (a, b, c, d)
+
+
+def get_contingency_all(np.ndarray[DTYPE32_t, ndim=2] fcst,
+                        np.ndarray[DTYPE32_t, ndim=2] obs,
+                        np.ndarray[DTYPE32_t, ndim=1] bins,
+                        np.ndarray[DTYPE_t, ndim=2] mask,
+                        int missing = 9999):
+
+    cdef unsigned int ii = fcst.shape[0]
+    cdef unsigned int jj = fcst.shape[1]
+    cdef unsigned int kk = bins.shape[0]-1
+    cdef Py_ssize_t i, j
+
+    cdef np.ndarray[DTYPE2_t, ndim=1] a = np.zeros(kk, dtype=DTYPE2)
+    cdef np.ndarray[DTYPE2_t, ndim=1] b = np.zeros(kk, dtype=DTYPE2)
+    cdef np.ndarray[DTYPE2_t, ndim=1] c = np.zeros(kk, dtype=DTYPE2)
+    cdef np.ndarray[DTYPE2_t, ndim=1] d = np.zeros(kk, dtype=DTYPE2)
+
+    for i in range(ii):
+        for j in range(jj):
+            if (mask[i,j] == 0 or mask[i,j] == missing or fcst[i,j] == missing
+                or obs[i,j] == missing):
+                    continue
+            for k in range(kk-1):
+                if fcst[i,j] >= bins[k] and fcst[i,j] < bins[k+1]:
+                    if obs[i,j] == 1:
+                        a[kk] += 1
+                    else:
+                        b[kk] += 1
+                else:
+                    if obs[i,j] == 1:
+                        c[kk] += 1
+                    else:
+                        d[kk] += 1
 
     return (a, b, c, d)
