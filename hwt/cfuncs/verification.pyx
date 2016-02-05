@@ -121,14 +121,14 @@ def get_contingency_all(np.ndarray[DTYPE32_t, ndim=2] fcst,
             if (mask[i,j] == 0 or mask[i,j] == missing or fcst[i,j] == missing
                 or obs[i,j] == missing):
                     continue
-            for k in range(kk-1):
+            for k in range(kk):
                 if fcst[i,j] >= bins[k] and fcst[i,j] < bins[k+1]:
-                    if obs[i,j] == 1:
+                    if obs[i,j] > 0:
                         a[kk] += 1
                     else:
                         b[kk] += 1
                 else:
-                    if obs[i,j] == 1:
+                    if obs[i,j] > 0:
                         c[kk] += 1
                     else:
                         d[kk] += 1
