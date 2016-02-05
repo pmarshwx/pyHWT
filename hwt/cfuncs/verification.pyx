@@ -98,6 +98,8 @@ def get_contingency(np.ndarray[DTYPE64_t, ndim=2] fcst,
     return (a, b, c, d)
 
 
+@cython.boundscheck(False)
+@cython.cdivision(True)
 def get_contingency_all(np.ndarray[DTYPE32_t, ndim=2] fcst,
                         np.ndarray[DTYPE32_t, ndim=2] obs,
                         np.ndarray[DTYPE32_t, ndim=1] bins,
