@@ -93,3 +93,108 @@ def get_contingency(np.ndarray[DTYPE64_t, ndim=2] fcst,
                     d += 1
 
     return (a, b, c, d)
+
+
+
+@cython.boundscheck(False)
+@cython.cdivision(True)
+cdef get_fss_fraction(np.ndarray[DTYPE_t, ndim=2] data, 
+                                     unsigned int roi):
+    
+    cdef Py_ssize_t i, j, ii, jj
+    cdef unsigned int xlen = data.shape[0]
+    cdef unsigned int ylen = data.shape[1]
+    cdef unsigned int rxx
+    cdef unsigned int rxn
+    cdef unsigned int ryx
+    cdef unsigned int ryn
+    cdef np.ndarray[DTYPE64_t, ndim=2] frac = np.zeros([xlen, ylen], dtype=DTYPE64)
+
+    for i in xrange(xlen):
+        # xlen/ylen - 1 to give proper index value
+        # for min functions
+        rxx = min(xlen -1, i + roi)
+        rxn = max(0, i - roi)
+        for j in xrange(ylen):
+            ryx = min(ylen - 1, j + roi)
+            ryn = max(0, j - roi)
+            # rxx/ryx + 1 to be included in xrange
+            for ii in xrange(rxn, rxx + 1):
+                for jj in xrange(ryn, ryx + 1):
+                    if data[ii, jj] == 1:
+                        frac[i, j ] += 1
+
+    frac = frac/roi**2
+
+    return frac
+
+
+
+@cython.boundscheck(False)
+@cython.cdivision(True)
+cdef get_fss_mse(np.ndarray[DTYPE64_t, ndim = 2] obs, 
+                               np.ndarray[DTYPE64_t, ndim = 2] fcst):
+
+    cdef Py_ssize_t i, j
+    cdef unsigned int nx, ny
+    cdef double mse = 0
+
+    if (obs.shape[0] != fcst.shape[0]) or (obs.shape[1] != fcst.shape[1]):
+        raise ValueError('Observation and forecast arrays must be the same shape.')
+
+    nx = obs.shape[0]
+    ny = obs.shape[1]
+
+    for i in xrange(nx):
+        for j in xrange(ny):
+            mse = mse + (obs[i,j] - fcst[i,j])*(obs[i,j] - fcst[i,j])
+
+    mse = mse/(nx*ny)
+
+    return mse
+
+
+
+@cython.boundscheck(False)
+@cython.cdivision(True)
+cdef get_fss_ref(np.ndarray[DTYPE64_t, ndim = 2] obs, 
+                             np.ndarray[DTYPE64_t, ndim = 2] fcst):
+
+    cdef Py_ssize_t i, j
+    cdef unsigned int nx, ny
+    cdef double ref = 0
+
+    if (obs.shape[0] != fcst.shape[0]) or (obs.shape[1] != fcst.shape[1]):
+        raise ValueError('Observation and forecast arrays must be the same shape.')
+
+    nx = obs.shape[0]
+    ny = obs.shape[1]
+
+    for i in xrange(nx):
+        for j in xrange(ny):
+            ref = ref + obs[i,j]*obs[i,j] + fcst[i,j]*fcst[i,j]
+
+    ref = ref/(nx/ny)
+
+    return ref
+
+
+
+def fss(obs, fcst, n = 0):
+
+    if n < 0:
+        raise ValueError('Neighborhood radius cannot be negative.')
+
+    if n > 0:
+        ofrac = get_fss_fraction(obs, n)
+        ffrac = get_fss_fraction(fcst, n)
+
+        mse = get_fss_mse(ofrac, ffrac)
+        ref = get_fss_ref(ofrac, ffrac)
+    else:
+        mse = get_fss_mse(obs, fcst)
+        ref = get_fss_ref(obs, fcst)
+
+    fss = 1 - mse/ref
+
+    return fss
