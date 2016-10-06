@@ -1,7 +1,6 @@
 cimport cython
 import numpy as np
 cimport numpy as np
-import pdb
 
 cdef extern from 'math.h':
     float sqrt(float x)
