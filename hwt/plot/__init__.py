@@ -1,2 +1,2 @@
-import ctables
-import funcs
+from hwt.plot import ctables
+from hwt.plot import funcs

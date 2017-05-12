@@ -288,6 +288,9 @@ def fss(obs, fcst, r = None, dx = None, neighborhood = None):
     else:
         raise ValueError('Invalid neighborhood type.')
 
-    fss = 1 - mse/ref
+    if ref == 0:
+        fss = np.nan
+    else:
+        fss = 1 - mse/ref
 
     return fss

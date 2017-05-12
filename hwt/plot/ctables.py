@@ -1763,7 +1763,7 @@ _Positive_Definite_data = {
 
     
 datad = {}
-for name in locals().keys():
+for name in list(locals().keys()):
     if name.endswith('_data'):
         newname = name[1:-5]
         
