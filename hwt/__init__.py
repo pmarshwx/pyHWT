@@ -1,6 +1,6 @@
-import version
-import plot
-from cfuncs import *
+from hwt import version
+from hwt import plot
+from hwt.cfuncs import *
 
 __all__ = ["cfuncs"]
 

@@ -28,7 +28,6 @@ def circle(np.ndarray[DTYPE64_t, ndim=2] data,
     cdef float rng, distsq, dist
     cdef Py_ssize_t i, j, ii, jj
 
-    cdef np.ndarray[DTYPE64_t, ndim=2] hitmiss = np.zeros([ulength, vlength], dtype=DTYPE64)
     cdef np.ndarray[DTYPE64_t, ndim=2] tmphit = np.zeros([ulength, vlength], dtype=DTYPE64)
 
     rng = roi/dx
@@ -67,7 +66,6 @@ def circle_expand(np.ndarray[DTYPE64_t, ndim=2] data,
     cdef float rng, distsq, dist
     cdef Py_ssize_t i, j, ii, jj
 
-    cdef np.ndarray[DTYPE64_t, ndim=2] hitmiss = np.zeros([ulength, vlength], dtype=DTYPE64)
     cdef np.ndarray[DTYPE64_t, ndim=2] tmphit = np.zeros([ulength, vlength], dtype=DTYPE64)
 
     rng = roi/dx
@@ -92,6 +90,48 @@ def circle_expand(np.ndarray[DTYPE64_t, ndim=2] data,
 
     return tmphit
 
+@cython.boundscheck(False)
+@cython.cdivision(True)
+def circle_comax(np.ndarray[DTYPE64_t, ndim=2] data1,
+           np.ndarray[DTYPE64_t, ndim=2] data2,
+           float thresh,
+           float roi,
+           float dx):
+
+    cdef unsigned int ulength = data1.shape[0]
+    cdef unsigned int vlength = data1.shape[1]
+    cdef unsigned int ng
+    cdef int jw, je, isouth, inorth
+    cdef float rng, distsq, dist, nmax
+    cdef Py_ssize_t i, j, ii, jj
+
+    cdef np.ndarray[DTYPE64_t, ndim=2] tmphit = np.zeros([ulength, vlength], dtype=DTYPE64)
+
+    if ulength != data2.shape[0] or vlength != data2.shape[1]:
+        raise ValueError('Sizes of input arrays do not match')
+
+    rng = roi/dx
+    ng = int(rng)
+    nmax = 0
+
+    for i in range(ulength):
+        for j in range(vlength):
+            jw = j-ng
+            je = j+ng + 1
+            isouth = i-ng
+            inorth = i+ng + 1
+            if data1[i,j] >= thresh:
+                for ii in range(isouth, inorth):
+                    for jj in range(jw, je):
+                        distsq = float(j-jj)**2 + float(i-ii)**2
+                        dist = distsq**0.5
+                        if dist <= rng:
+                            if jj < 0 or jj >= vlength or ii < 0 or ii >= ulength:
+                                continue
+                            if tmphit[i, j] < data2[ii,jj]:
+                                tmphit[i,j] = data2[ii,jj]
+
+    return tmphit
 
 @cython.boundscheck(False)
 @cython.cdivision(True)
@@ -107,7 +147,6 @@ def circle_sum(np.ndarray[DTYPE64_t, ndim=2] data,
     cdef float rng, distsq, dist
     cdef Py_ssize_t i, j, ii, jj
 
-    cdef np.ndarray[DTYPE64_t, ndim=2] hitmiss = np.zeros([ulength, vlength], dtype=DTYPE64)
     cdef np.ndarray[DTYPE64_t, ndim=2] tmphit = np.zeros([ulength, vlength], dtype=DTYPE64)
 
     rng = roi/dx
