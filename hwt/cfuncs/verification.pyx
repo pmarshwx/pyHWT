@@ -251,7 +251,7 @@ def fss(obs, fcst, r = None, dx = None, neighborhood = None):
     ------
     ValueError
         The neighborhood size is negative, the input arrays are
-        difference sizes, or the neighborhood type is unknown.
+        different sizes, or the neighborhood type is unknown.
 
     Notes
     -----
